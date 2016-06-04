@@ -4,8 +4,8 @@ version = "0.1.0"
 authors = ["Noah Peeters <noah.peeters@icloud.com>"]
 description = "Do your calculations with exact floating point numbers"
 repository = "https://github.com/NoahPeeters/rust-exact-float"
-keywords = ["floating point", "float", "exact"]
+keywords = ["floating", "float", "exact"]
 license = "MIT"
 
 [dependencies]
-num="*"
+num="0.1.32"
