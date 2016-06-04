@@ -67,10 +67,6 @@ impl ExactFloat {
             denominator: One::one()
         }
     }
-    // fn get_sign(&self) -> f64 {
-    //     let sign_bit = (self.numerator < Zero::zero()) ^ (self.denominator < Zero::zero());
-    //     if sign_bit {-1.0} else {1.0}
-    // }
     pub fn pre_calculate(&mut self) {
         let (numerator, denominator) = reduce(&self.numerator, &self.denominator);
         self.numerator = numerator;
@@ -97,7 +93,7 @@ impl<T: ExactFloatNumber> Add<T> for ExactFloat {
     fn add(self, other: T) -> ExactFloat {
         let as_exact_float = other.from_integer();
         ExactFloat {
-            numerator: as_exact_float.denominator.clone() * self.numerator + self.denominator.clone() * as_exact_float.numerator,
+            numerator: &as_exact_float.denominator * self.numerator + &self.denominator * as_exact_float.numerator,
             denominator: self.denominator * as_exact_float.denominator
         }
     }
@@ -106,8 +102,8 @@ impl<T: ExactFloatNumber> Add<T> for ExactFloat {
 impl<T: ExactFloatNumber> AddAssign<T> for ExactFloat {
     fn add_assign(&mut self, other: T) {
         let as_exact_float = other.from_integer();
-        self.numerator = as_exact_float.denominator.clone() * self.numerator.clone() + self.denominator.clone() * as_exact_float.numerator;
-        self.denominator = self.denominator.clone() * as_exact_float.denominator;
+        self.numerator = &as_exact_float.denominator * &self.numerator + &self.denominator * as_exact_float.numerator;
+        self.denominator = &self.denominator * as_exact_float.denominator;
     }
 }
 
@@ -117,8 +113,8 @@ impl<T: ExactFloatNumber> Sub<T> for ExactFloat {
     fn sub(self, other: T) -> ExactFloat {
         let as_exact_float = other.from_integer();
         ExactFloat {
-            numerator: as_exact_float.denominator.clone() * self.numerator - self.denominator.clone() * as_exact_float.numerator,
-            denominator: self.denominator * as_exact_float.denominator
+            numerator: &as_exact_float.denominator * self.numerator - &self.denominator * as_exact_float.numerator,
+            denominator: &self.denominator * &as_exact_float.denominator
         }
     }
 }
@@ -126,8 +122,8 @@ impl<T: ExactFloatNumber> Sub<T> for ExactFloat {
 impl<T: ExactFloatNumber> SubAssign<T> for ExactFloat {
     fn sub_assign(&mut self, other: T) {
         let as_exact_float = other.from_integer();
-        self.numerator = as_exact_float.denominator.clone() * self.numerator.clone() - self.denominator.clone() * as_exact_float.numerator;
-        self.denominator = self.denominator.clone() * as_exact_float.denominator;
+        self.numerator = &as_exact_float.denominator * &self.numerator - &self.denominator * as_exact_float.numerator;
+        self.denominator = &self.denominator * &as_exact_float.denominator;
     }
 }
 
@@ -146,8 +142,8 @@ impl<T: ExactFloatNumber> Mul<T> for ExactFloat {
 impl<T: ExactFloatNumber> MulAssign<T> for ExactFloat {
     fn mul_assign(&mut self, other: T) {
         let as_exact_float = other.from_integer();
-        self.numerator = self.numerator.clone() * as_exact_float.numerator;
-        self.denominator = self.denominator.clone() * as_exact_float.denominator;
+        self.numerator = &self.numerator * as_exact_float.numerator;
+        self.denominator = &self.denominator * as_exact_float.denominator;
     }
 }
 
@@ -166,8 +162,8 @@ impl<T: ExactFloatNumber> Div<T> for ExactFloat {
 impl<T: ExactFloatNumber> DivAssign<T> for ExactFloat {
     fn div_assign(&mut self, other: T) {
         let as_exact_float = other.from_integer();
-        self.numerator = self.numerator.clone() * as_exact_float.denominator;
-        self.denominator = self.denominator.clone() * as_exact_float.numerator;
+        self.numerator = &self.numerator * as_exact_float.denominator;
+        self.denominator = &self.denominator * as_exact_float.numerator;
     }
 }
 
@@ -180,43 +176,4 @@ impl Neg for ExactFloat {
             denominator: self.denominator
         }
     }
-}
-
-
-#[test]
-fn test_add() {
-    let f = ExactFloat::new(10);
-    let n = f.clone() + 1;
-    let p = f * n;
-    assert_eq!(p.calculate().unwrap(), 110.0);
-}
-
-#[test]
-fn test_mul() {
-    let f = ExactFloat::new(10);
-    let n = f.clone() * 2;
-    let p = f * n;
-    assert_eq!(p.calculate().unwrap(), 200.0);
-}
-
-#[test]
-fn test_div() {
-    let f = ExactFloat::new(10);
-    let mut n = f.clone() / 3;
-    n *= 33;
-    assert_eq!(n.calculate().unwrap(), 110.0);
-
-    n.pre_calculate();
-    assert_eq!(n.calculate().unwrap(), 110.0);
-}
-
-#[test]
-fn test_neg() {
-    let f = ExactFloat::new(-10);
-    let f = f.clone() * 2;
-    let n = f.clone() * -3;
-    assert_eq!(n.calculate().unwrap(), 60.0);
-    let n = -n;
-    assert_eq!(n.calculate().unwrap(), -60.0);
-    assert_eq!(n.abs().calculate().unwrap(), 60.0);
 }
