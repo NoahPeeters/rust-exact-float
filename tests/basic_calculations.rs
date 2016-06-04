@@ -13,9 +13,9 @@ fn test_add() {
 #[test]
 fn test_mul() {
     let f = ExactFloat::new(10);
-    let n = f.clone() * 2;
+    let n = f.clone() * f.clone() / 2;
     let p = f * n;
-    assert_eq!(p.calculate().unwrap(), 200.0);
+    assert_eq!(p.calculate().unwrap(), 500.0);
 }
 
 #[test]
