@@ -1,6 +1,6 @@
 extern crate num;
 use num::integer::Integer;
-use num::{BigInt, One};
+use num::{BigInt, One, abs};
 use num::cast::ToPrimitive;
 use num::bigint::ToBigInt;
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Neg};
@@ -81,6 +81,12 @@ impl ExactFloat {
         match (numerator.to_f64(), denominator.to_f64()) {
             (Some(numerator), Some(denominator)) => Some(numerator / denominator),
             _ => None
+        }
+    }
+    pub fn abs(&self) -> ExactFloat {
+        ExactFloat {
+            numerator: abs(self.numerator.clone()),
+            denominator: abs(self.denominator.clone())
         }
     }
 }
@@ -202,4 +208,15 @@ fn test_div() {
 
     n.pre_calculate();
     assert_eq!(n.calculate().unwrap(), 110.0);
+}
+
+#[test]
+fn test_neg() {
+    let f = ExactFloat::new(-10);
+    let f = f.clone() * 2;
+    let n = f.clone() * -3;
+    assert_eq!(n.calculate().unwrap(), 60.0);
+    let n = -n;
+    assert_eq!(n.calculate().unwrap(), -60.0);
+    assert_eq!(n.abs().calculate().unwrap(), 60.0);
 }
