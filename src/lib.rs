@@ -1,4 +1,6 @@
+#![feature(float_extras)]
 extern crate num;
+
 use num::integer::Integer;
 use num::{BigInt, One, abs};
 use num::cast::ToPrimitive;
@@ -10,7 +12,7 @@ fn reduce(a: &BigInt, b: &BigInt) -> (BigInt, BigInt) {
     (a / gcd.clone(), b / gcd)
 }
 
-pub trait ExactFloatNumber: std::marker::Sized {
+pub trait ExactFloatNumber {
     fn from_integer(self) -> ExactFloat;
 }
 
@@ -50,11 +52,44 @@ impl ExactFloatNumber for i64 {
     fn from_integer(self) -> ExactFloat {ExactFloat::from_bigint(self.to_bigint().unwrap())}
 }
 
+impl ExactFloatNumber for f32 {
+    fn from_integer(self) -> ExactFloat {
+        let (mantissa, exponent, sign) = self.integer_decode();
+        let (numerator, denominator) = if exponent > 0 {
+            (mantissa * 2u64.pow(exponent as u32), 1)
+        }
+        else {
+            (mantissa, 2u64.pow((-exponent) as u32))
+        };
+        ExactFloat {
+            numerator: (numerator * sign as u64).to_bigint().unwrap(),
+            denominator: denominator.to_bigint().unwrap()
+        }
+    }
+}
+
+impl ExactFloatNumber for f64 {
+    fn from_integer(self) -> ExactFloat {
+        let (mantissa, exponent, sign) = self.integer_decode();
+        println!("{:?}, {:?}", mantissa, exponent);
+        let (numerator, denominator) = if exponent > 0 {
+            (mantissa * 2u64.pow(exponent as u32), 1)
+        }
+        else {
+            (mantissa, 2u64.pow((-exponent) as u32))
+        };
+        ExactFloat {
+            numerator: (numerator * sign as u64).to_bigint().unwrap(),
+            denominator: denominator.to_bigint().unwrap()
+        }
+    }
+}
+
 
 #[derive(Clone, Debug)]
 pub struct ExactFloat {
-    numerator: BigInt,
-    denominator: BigInt
+    pub numerator: BigInt,
+    pub denominator: BigInt
 }
 
 impl ExactFloat {

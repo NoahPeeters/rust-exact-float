@@ -39,3 +39,12 @@ fn test_neg() {
     assert_eq!(n.calculate().unwrap(), -60.0);
     assert_eq!(n.abs().calculate().unwrap(), 60.0);
 }
+
+#[test]
+fn test_float() {
+    let mut f = ExactFloat::new(2.0f64);
+    println!("{:?}", f);
+    f.pre_calculate();
+    println!("{:?}", f);
+    assert_eq!(f.calculate().unwrap(), 2.0);
+}
